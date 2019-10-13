@@ -1,0 +1,73 @@
+
+version: '3'
+
+services:
+  pphp:
+    container_name: pphp
+    image: php:7-fpm
+    # restart: always
+    volumes:
+      - ./html/html:/var/www/html
+    # build:
+    #   context: .
+    #   dockerfile: html/Dockerfile
+    environment:
+      DB_REPLICA_USER: root
+      DB_REPLICA_PASSWORD: password
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: phdb
+      WORDPRESS_DB_PASSWORD: phdb
+      WORDPRESS_DB_NAME: phdb
+    ports:
+      - "9000:9000"
+    depends_on:
+      - ph_db
+    tty: true
+    # networks:
+    #   cmedianet:
+    #     ipv4_address: 192.168.202.2
+
+  ph_db:
+    container_name: ph_db
+    image: mysql:5.7
+    # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: phdb
+      MYSQL_USER: phdb
+      MYSQL_PASSWORD: phdb
+    ports:
+      - "3306:3306"
+    # networks:
+    #   cmedianet:
+    #     ipv4_address: 192.168.202.2
+    volumes:
+      # - db_data:/var/lib/mysql
+      - ./mysql-data:/var/lib/mysql
+      # - ./mysql-data/init:/docker-entrypoint-initdb.d
+      # - ./mysql-data/my.cnf:/etc/mysql/conf.d/my.cnf
+  nnginx:
+    container_name: nnginx
+    image: nginx:1.13.5-alpine
+    depends_on:
+      - pphp
+    ports:
+      - "8080:80"
+    # networks:
+    #   - cmedianet
+    volumes:
+      - ./html/html:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/log:/etc/log/nginx
+
+
+volumes:
+  db_data:
+
+# networks:
+#   cmedianet:
+#     driver: bridge
+#     ipam:
+#       config:
+#       - subnet: 192.168.202.0/24
