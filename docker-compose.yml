@@ -23,9 +23,6 @@ services:
     depends_on:
       - ph_db
     tty: true
-    # networks:
-    #   cmedianet:
-    #     ipv4_address: 192.168.202.2
 
   ph_db:
     container_name: ph_db
@@ -38,14 +35,9 @@ services:
       MYSQL_PASSWORD: phdb
     ports:
       - "3306:3306"
-    # networks:
-    #   cmedianet:
-    #     ipv4_address: 192.168.202.2
     volumes:
       # - db_data:/var/lib/mysql
       - ./mysql-data:/var/lib/mysql
-      # - ./mysql-data/init:/docker-entrypoint-initdb.d
-      # - ./mysql-data/my.cnf:/etc/mysql/conf.d/my.cnf
   nnginx:
     container_name: nnginx
     image: nginx:1.13.5-alpine
@@ -58,16 +50,8 @@ services:
     volumes:
       - ./html/html:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/log:/etc/log/nginx
 
 
 volumes:
   db_data:
-
-# networks:
-#   cmedianet:
-#     driver: bridge
-#     ipam:
-#       config:
-#       - subnet: 192.168.202.0/24
